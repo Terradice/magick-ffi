@@ -59,7 +59,10 @@ var gm = ffi.Library('libMagickWand-7.Q16HDRI', {
     'MagickResizeImage':    [ 'bool',   [ wandPtr, "int", "int", "int" ] ],
     'MagickGetImage':       [ wandPtr,  [ wandPtr ] ],
     'MagickAddImage':       [ 'void',   [ wandPtr, wandPtr ] ],
-    'MagickCoalesceImages': [ wandPtr,  [ wandPtr ] ]
+    'MagickCoalesceImages': [ wandPtr,  [ wandPtr ] ],
+    
+    // Properties
+    'MagickSetOption': [ 'bool', [ wandPtr, "string", "string" ] ]
 });
 
 gm.MagickWandGenesis();
