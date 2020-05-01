@@ -48,6 +48,7 @@ var gm = ffi.Library('libMagickWand-7.Q16HDRI', {
     
     // IO
     'MagickReadImage':      [ 'bool',   [ wandPtr, "string" ] ],
+    'MagickReadImageBlob':  [ 'bool',   [ wandPtr, "void", "int" ] ],
     'MagickWriteImage':     [ 'bool',   [ wandPtr, "string" ] ],
     'MagickWriteImages':    [ 'bool',   [ wandPtr, "string", "bool" ] ],
 
@@ -62,7 +63,7 @@ var gm = ffi.Library('libMagickWand-7.Q16HDRI', {
     'MagickCoalesceImages': [ wandPtr,  [ wandPtr ] ],
     
     // Properties
-    'MagickSetOption': [ 'bool', [ wandPtr, "string", "string" ] ]
+    'MagickSetOption':      [ 'bool',   [ wandPtr, "string", "string" ] ]
 });
 
 gm.MagickWandGenesis();
