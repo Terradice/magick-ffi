@@ -1,0 +1,20 @@
+{
+  "name": "magick-ffi",
+  "version": "1.0.0",
+  "description": "ImageMagick FFI bindings",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "magick",
+    "imagemagick",
+    "ffi"
+  ],
+  "author": "Terradice",
+  "license": "ISC",
+  "dependencies": {
+    "ffi-napi": "^2.5.0",
+    "ref-napi": "^2.0.0"
+  }
+}
