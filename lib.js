@@ -2,7 +2,6 @@
 const ffi = require("ffi-napi");
 const ref = require('ref-napi');
 
-// var wand = ; // we don't know what the layout of "sqlite3" looks like
 var wandPtr = ref.refType(ref.types.void);
 var FilterTypes = Object.freeze({
     "UndefinedFilter":      0,
@@ -61,12 +60,14 @@ var gm = ffi.Library('libMagickWand-7.Q16HDRI', {
     'MagickGetImage':       [ wandPtr,  [ wandPtr ] ],
     'MagickAddImage':       [ 'void',   [ wandPtr, wandPtr ] ],
     'MagickCoalesceImages': [ wandPtr,  [ wandPtr ] ],
+    'MagickLiquidRescaleImage': [ 'bool',   [ wandPtr, 'int', 'int', 'double', 'double' ] ],
+    
     
     // Properties
-    'MagickSetOption':      [ 'bool',   [ wandPtr, "string", "string" ] ]
+    'MagickSetOption':      [ 'bool',   [ wandPtr, "string", "string" ] ],
+    // 'MagickDescribeImage':  [ 'string'  [ wandPtr ] ]
 });
 
-gm.MagickWandGenesis();
 
 // for(let i = 0; i < gm.MagickGetNumberImages(wand) ; i++) {
 //     gm.MagickSetIteratorIndex(wand, i);
@@ -77,25 +78,47 @@ gm.MagickWandGenesis();
 // }
 
 // gm.MagickResizeImage(wand, 100, 100, FilterTypes.LanczosFilter);
-gm.MagickWandTerminus();
+module.exports.genesis = gm.MagickWandGenesis;
+module.exports.terminus = gm.MagickWandTerminus;
 
 
 module.exports.load = (buf) => {
-    this.wand = gm.NewMagickWand();
-    gm.MagickReadImageBlob(this.wand, buf, buf.length);
-    return this;
+    return new Image().read(buf);
 }
 
-module.exports.resize = (w, h) => {
-    gm.MagickResizeImage(this.wand, 100, 100, FilterTypes.LanczosFilter);
-    return this;
-}
+class Image {
+    constructor() {
+        this.wand = gm.NewMagickWand();
+    }
 
-module.exports.coalesce = () => {
-    this.wand = gm.MagickCoalesceImages(this.wand);
-    return this;
-}
+    // describe() {
+    //     return new Promise((resolve, reject) => {
+    //         let data = gm.MagickDescribeImage(this.wand);
+    //         resolve(data);
+    //     })
+    // }
 
-module.exports.write = (file) => {
-    gm.MagickWriteImages(this.wand, file, true);
+    read(buf) {
+        gm.MagickReadImageBlob(this.wand, buf, buf.length);
+        return this;
+    }
+
+    resize(w, h) {
+        gm.MagickResizeImage(this.wand, w, h, FilterTypes.LanczosFilter);
+        return this;
+    }
+
+    liquid_rescale(w, h, delta_x=1, rigidity=0) {
+        gm.MagickLiquidRescaleImage(this.wand, w, h, delta_x, rigidity);
+        return this;
+    }
+
+    coalesce() {
+        gm.MagickCoalesceImages(this.wand);        
+        return this;
+    }
+
+    write(file) {
+        gm.MagickWriteImages(this.wand, file, true);
+    }
 }
