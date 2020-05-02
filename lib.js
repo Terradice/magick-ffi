@@ -48,7 +48,7 @@ var gm = ffi.Library('libMagickWand-7.Q16HDRI', {
     
     // IO
     'MagickReadImage':      [ 'bool',   [ wandPtr, "string" ] ],
-    'MagickReadImageBlob':  [ 'bool',   [ wandPtr, "void", "int" ] ],
+    'MagickReadImageBlob':  [ 'bool',   [ wandPtr, "string", "int" ] ],
     'MagickWriteImage':     [ 'bool',   [ wandPtr, "string" ] ],
     'MagickWriteImages':    [ 'bool',   [ wandPtr, "string", "bool" ] ],
 
@@ -67,20 +67,35 @@ var gm = ffi.Library('libMagickWand-7.Q16HDRI', {
 });
 
 gm.MagickWandGenesis();
-let wand = gm.NewMagickWand();
-gm.MagickReadImage(wand, process.argv[2]);
 
-for(let i = 0; i < gm.MagickGetNumberImages(wand) ; i++) {
-    gm.MagickSetIteratorIndex(wand, i);
-    let tmp = gm.MagickGetImage(wand);
-    // gm.MagickAddImage(wand, tmp);
-    gm.MagickResizeImage(wand, 100, 100, FilterTypes.LanczosFilter);
-    // DestroyMagickWand(tw);
-}
+// for(let i = 0; i < gm.MagickGetNumberImages(wand) ; i++) {
+//     gm.MagickSetIteratorIndex(wand, i);
+//     let tmp = gm.MagickGetImage(wand);
+//     // gm.MagickAddImage(wand, tmp);
+//     gm.MagickResizeImage(wand, 100, 100, FilterTypes.LanczosFilter);
+//     // DestroyMagickWand(tw);
+// }
 
 // gm.MagickResizeImage(wand, 100, 100, FilterTypes.LanczosFilter);
-wand = gm.MagickCoalesceImages(wand);
-
-gm.MagickWriteImages(wand, process.argv[3], true);
-
 gm.MagickWandTerminus();
+
+
+module.exports.load = (buf) => {
+    this.wand = gm.NewMagickWand();
+    gm.MagickReadImageBlob(this.wand, buf, buf.length);
+    return this;
+}
+
+module.exports.resize = (w, h) => {
+    gm.MagickResizeImage(this.wand, 100, 100, FilterTypes.LanczosFilter);
+    return this;
+}
+
+module.exports.coalesce = () => {
+    this.wand = gm.MagickCoalesceImages(this.wand);
+    return this;
+}
+
+module.exports.write = (file) => {
+    gm.MagickWriteImages(this.wand, file, true);
+}
