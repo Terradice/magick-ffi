@@ -65,6 +65,12 @@ var gm = ffi.Library('libMagickWand-7.Q16HDRI', {
     
     // Properties
     'MagickSetOption':      [ 'bool',   [ wandPtr, "string", "string" ] ],
+    'MagickGetImageWidth':  [ 'int',    [ wandPtr ] ],
+    'MagickGetImageHeight': [ 'int',    [ wandPtr ] ],
+    'MagickGetImageBlob':   [ ref.refType(ref.types.void), [ wandPtr, ref.refType(ref.types.size_t) ] ]
+
+    //unsigned char *MagickGetImageBlob(MagickWand *wand,size_t *length)
+    
     // 'MagickDescribeImage':  [ 'string'  [ wandPtr ] ]
 });
 
@@ -91,10 +97,50 @@ class Image {
         this.wand = gm.NewMagickWand();
     }
 
+    get_number_images() {
+        return gm.MagickGetNumberImages(wand);
+        
+    }
+
+    get_width() {
+        return new Promise((resolve, reject) => {
+            resolve(gm.MagickGetImageWidth(this.wand));
+        })
+    }
+
+    get_height() {
+        return new Promise((resolve, reject) => {
+            resolve(gm.MagickGetImageHeight(this.wand));
+        })
+    }
+
+    get_blob() {
+        return new Promise((resolve, reject) => {
+            let len = Buffer.alloc(4);
+            len.type = ref.types.size_t;
+            let buf = gm.MagickGetImageBlob(this.wand, len);  
+            console.log(len.deref());
+            console.log(buf.deref());
+            
+                                      
+            resolve(buf);
+        })
+    }
+
     // describe() {
     //     return new Promise((resolve, reject) => {
     //         let data = gm.MagickDescribeImage(this.wand);
     //         resolve(data);
+    //     })
+    // }
+
+    // get_size() {
+    //     return new Promise((resolve, reject) => {
+    //         this.get_height().then((h) => {
+    //             this.get_width().then((w) => {
+    //                 resolve([h, w]);
+    //             })
+    //         })
     //     })
     // }
 

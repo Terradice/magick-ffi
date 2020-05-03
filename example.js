@@ -2,11 +2,22 @@
 const gm = require('./lib.js');
 const fs = require('fs');
 
-// gm.genesis();
+gm.genesis();
+(async () => {
+    let file = fs.readFileSync(process.argv[2]);
+    let img = gm.load(file);
+    let width = await img.get_width();
+    let height = await img.get_height();
+    console.log(`W: ${width} H: ${height}`);
 
-let data = fs.readFileSync(process.argv[2]);
-let img = gm.load(data).liquid_rescale(400, 400).liquid_rescale(800, 800).coalesce().write("out.png");
-console.log(img);
+    // img.liquid_rescale(width/1.2, height/1.2).liquid_rescale(width, height).coalesce().write(process.argv[3]);
+    img.resize(200, 200).coalesce().write(process.argv[3]);
+    // img.get_blob().then((buf) => {
+        // fs.writeFileSync("out.png", buf);
+    // })
+    // gm.terminus();
+})();
+// let img = gm.load(data).liquid_rescale(400, 400).liquid_rescale(800, 800).coalesce();
+// console.log(img);
 
-// gm.terminus();
 // gm.load(data).resize(100, 100).coalesce().write(process.argv[3]);
