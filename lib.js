@@ -67,7 +67,8 @@ var gm = ffi.Library('libMagickWand-7.Q16HDRI', {
     'MagickSetOption':      [ 'bool',   [ wandPtr, "string", "string" ] ],
     'MagickGetImageWidth':  [ 'int',    [ wandPtr ] ],
     'MagickGetImageHeight': [ 'int',    [ wandPtr ] ],
-    'MagickGetImageBlob':   [ ref.refType(ref.types.void), [ wandPtr, ref.refType(ref.types.size_t) ] ]
+    'MagickGetImageBlob':   [ 'string', [ wandPtr, "int" ] ],
+    'MagickSetImageFormat': [ 'bool',   [ wandPtr, 'string' ] ]
 
     //unsigned char *MagickGetImageBlob(MagickWand *wand,size_t *length)
     
@@ -116,8 +117,7 @@ class Image {
 
     get_blob() {
         return new Promise((resolve, reject) => {
-            let len = Buffer.alloc(4);
-            len.type = ref.types.size_t;
+            let len = 0;
             let buf = gm.MagickGetImageBlob(this.wand, len);  
             console.log(len.deref());
             console.log(buf.deref());
@@ -125,6 +125,11 @@ class Image {
                                       
             resolve(buf);
         })
+    }
+
+    set_format(form) {
+        gm.MagickSetImageFormat(this.wand, form);
+        return this;
     }
 
     // describe() {
