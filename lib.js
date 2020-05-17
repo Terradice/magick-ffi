@@ -24,6 +24,7 @@ const gm = ffi.Library("libMagickWand-7.Q16", {
   // Image
   MagickResizeImage: ["bool", [wandPtr, "int", "int", "int"]],
   MagickGetImage: [wandPtr, [wandPtr]],
+  MagickOptimizeImageLayers: [wandPtr, [wandPtr]],
   MagickAddImage: ["void", [wandPtr, wandPtr]],
   MagickCoalesceImages: [wandPtr, [wandPtr]],
   MagickLiquidRescaleImage: [
@@ -141,12 +142,17 @@ class Image {
   }
 
   coalesce() {
-    gm.MagickCoalesceImages(this.wand);
+    this.wand = gm.MagickCoalesceImages(this.wand);
     return this;
   }
 
   layersComposite(wand, operator, x = 0, y = 0) {
     gm.MagickCompositeLayers(this.wand, wand.wand, consts.CompositeOperators[operator ? operator + "CompositeOp" : "OverCompositeOp"], x, y);
+    return this;
+  }
+
+  layersOptimize() {
+    this.wand = gm.MagickOptimizeImageLayers(this.wand);
     return this;
   }
 
