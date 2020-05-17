@@ -1,82 +1,53 @@
-#!/usr/bin/node
 const ffi = require("ffi-napi");
-const ref = require('ref-napi');
+const ref = require("ref-napi");
+const consts = require("./consts");
 
-var wandPtr = ref.refType(ref.types.void);
-var FilterTypes = Object.freeze({
-    "UndefinedFilter":      0,
-    "PointFilter":          1,
-    "BoxFilter":            2,
-    "TriangleFilter":       3,
-    "HermiteFilter":        4,
-    "HannFilter":           5,
-    "HammingFilter":        6,
-    "BlackmanFilter":       7,
-    "GaussianFilter":       8,
-    "QuadraticFilter":      9,
-    "CubicFilter":          10,
-    "CatromFilter":         11,
-    "MitchellFilter":       12,
-    "JincFilter":           13,
-    "SincFilter":           14,
-    "SincFastFilter":       15,
-    "KaiserFilter":         16,
-    "WelchFilter":          17,
-    "ParzenFilter":         18,
-    "BohmanFilter":         19,
-    "BartlettFilter":       20,
-    "LagrangeFilter":       21,
-    "LanczosFilter":        22,
-    "LanczosSharpFilter":   23,
-    "Lanczos2Filter":       24,
-    "Lanczos2SharpFilter":  25,
-    "RobidouxFilter":       26,
-    "RobidouxSharpFilter":  27,
-    "CosineFilter":         28,
-    "SplineFilter":         29,
-    "LanczosRadiusFilter":  30,
-    "CubicSplineFilter":    31,
-    "SentinelFilter":       32
-})
+const wandPtr = ref.refType(ref.types.void);
 
-var gm = ffi.Library('libMagickWand-7.Q16', {
-    // Initialization and such
-    'MagickWandGenesis':    [ 'void',   [ ] ],
-    'MagickWandTerminus':   [ 'void',   [ ] ],
-    'NewMagickWand':        [ wandPtr,  [ ] ],
-    
-    // IO
-    'MagickReadImage':      [ 'bool',   [ wandPtr, "string" ] ],
-    'MagickReadImageBlob':  [ 'bool',   [ wandPtr, "string", "int" ] ],
-    'MagickWriteImage':     [ 'bool',   [ wandPtr, "string" ] ],
-    'MagickWriteImages':    [ 'bool',   [ wandPtr, "string", "bool" ] ],
+const gm = ffi.Library("libMagickWand-7.Q16", {
+  // Initialization and such
+  MagickWandGenesis: ["void", []],
+  MagickWandTerminus: ["void", []],
+  NewMagickWand: [wandPtr, []],
 
-    // Iteration
-    'MagickGetNumberImages':    [ 'int',    [ wandPtr ] ],
-    'MagickSetIteratorIndex':   [ 'void',   [ wandPtr, 'int' ] ],
-    'MagickResetIterator':      [ 'void',   [ wandPtr ] ],
+  // IO
+  MagickReadImage: ["bool", [wandPtr, "string"]],
+  MagickReadImageBlob: ["bool", [wandPtr, "string", "int"]],
+  MagickWriteImage: ["bool", [wandPtr, "string"]],
+  MagickWriteImages: ["bool", [wandPtr, "string", "bool"]],
 
-    // Image
-    'MagickResizeImage':    [ 'bool',   [ wandPtr, "int", "int", "int" ] ],
-    'MagickGetImage':       [ wandPtr,  [ wandPtr ] ],
-    'MagickAddImage':       [ 'void',   [ wandPtr, wandPtr ] ],
-    'MagickCoalesceImages': [ wandPtr,  [ wandPtr ] ],
-    'MagickLiquidRescaleImage': [ 'bool',   [ wandPtr, 'int', 'int', 'double', 'double' ] ],
-    
-    
-    // Properties
-    'MagickSetOption':      [ 'bool',   [ wandPtr, "string", "string" ] ],
-    'MagickSetFilename':    [ 'bool',   [ wandPtr, "string" ] ],
-    'MagickGetImageWidth':  [ 'int',    [ wandPtr ] ],
-    'MagickGetImageHeight': [ 'int',    [ wandPtr ] ],
-    'MagickGetImagesBlob':  [ "uint8*", [ wandPtr, ref.refType(ref.types.int) ] ],
-    'MagickSetImageFormat': [ 'bool',   [ wandPtr, 'string' ] ]
+  // Iteration
+  MagickGetNumberImages: ["int", [wandPtr]],
+  MagickSetIteratorIndex: ["void", [wandPtr, "int"]],
+  MagickResetIterator: ["void", [wandPtr]],
 
-    //unsigned char *MagickGetImageBlob(MagickWand *wand,size_t *length)
-    
-    // 'MagickDescribeImage':  [ 'string'  [ wandPtr ] ]
+  // Image
+  MagickResizeImage: ["bool", [wandPtr, "int", "int", "int"]],
+  MagickGetImage: [wandPtr, [wandPtr]],
+  MagickAddImage: ["void", [wandPtr, wandPtr]],
+  MagickCoalesceImages: [wandPtr, [wandPtr]],
+  MagickLiquidRescaleImage: [
+    "bool",
+    [wandPtr, "int", "int", "double", "double"],
+  ],
+  MagickCompositeLayers: ["bool", [wandPtr, wandPtr, "int", "int", "int"]],
+  MagickCompositeImage: [
+    "bool",
+    [wandPtr, wandPtr, "int", "bool", "int", "int"],
+  ],
+
+  // Properties
+  MagickSetOption: ["bool", [wandPtr, "string", "string"]],
+  MagickSetFilename: ["bool", [wandPtr, "string"]],
+  MagickGetImageWidth: ["int", [wandPtr]],
+  MagickGetImageHeight: ["int", [wandPtr]],
+  MagickGetImagesBlob: ["uint8*", [wandPtr, ref.refType(ref.types.int)]],
+  MagickSetImageFormat: ["bool", [wandPtr, "string"]],
+
+  //unsigned char *MagickGetImageBlob(MagickWand *wand,size_t *length)
+
+  // 'MagickDescribeImage':  [ 'string'  [ wandPtr ] ]
 });
-
 
 // for(let i = 0; i < gm.MagickGetNumberImages(wand) ; i++) {
 //     gm.MagickSetIteratorIndex(wand, i);
@@ -87,89 +58,94 @@ var gm = ffi.Library('libMagickWand-7.Q16', {
 // }
 
 // gm.MagickResizeImage(wand, 100, 100, FilterTypes.LanczosFilter);
+module.exports = gm;
 module.exports.genesis = gm.MagickWandGenesis;
 module.exports.terminus = gm.MagickWandTerminus;
 
-
 module.exports.load = (buf) => {
-    return new Image().read(buf);
-}
+  return typeof buf === "string" ? new Image().readFile(buf) : new Image().read(buf);
+};
 
 class Image {
-    constructor() {
-        this.wand = gm.NewMagickWand();
-    }
+  constructor() {
+    this.wand = gm.NewMagickWand();
+  }
 
-    get_number_images() {
-        return gm.MagickGetNumberImages(wand);
-        
-    }
+  get_number_images() {
+    return gm.MagickGetNumberImages(wand);
+  }
 
-    get_width() {
-        return new Promise((resolve, reject) => {
-            resolve(gm.MagickGetImageWidth(this.wand));
-        })
-    }
+  get_width() {
+    return new Promise((resolve, reject) => {
+      resolve(gm.MagickGetImageWidth(this.wand));
+    });
+  }
 
-    get_height() {
-        return new Promise((resolve, reject) => {
-            resolve(gm.MagickGetImageHeight(this.wand));
-        })
-    }
+  get_height() {
+    return new Promise((resolve, reject) => {
+      resolve(gm.MagickGetImageHeight(this.wand));
+    });
+  }
 
-    get_blob() {
-        return new Promise((resolve, reject) => {
-            let len = ref.alloc("size_t", 0);
-            gm.MagickResetIterator(this.wand);
-            let out = gm.MagickGetImagesBlob(this.wand, len);
-            let buf = Buffer.alloc(len.deref(), ref.reinterpret(out, len.deref()));
-            resolve(buf);
-        })
-    }
+  get_blob() {
+    return new Promise((resolve, reject) => {
+      let len = ref.alloc("size_t", 0);
+      gm.MagickResetIterator(this.wand);
+      let out = gm.MagickGetImagesBlob(this.wand, len);
+      let buf = Buffer.alloc(len.deref(), ref.reinterpret(out, len.deref()));
+      resolve(buf);
+    });
+  }
 
-    set_format(form) {
-        gm.MagickSetImageFormat(this.wand, form);
-        return this;
-    }
+  set_format(form) {
+    gm.MagickSetImageFormat(this.wand, form);
+    return this;
+  }
 
-    // describe() {
-    //     return new Promise((resolve, reject) => {
-    //         let data = gm.MagickDescribeImage(this.wand);
-    //         resolve(data);
-    //     })
-    // }
+  // describe() {
+  //     return new Promise((resolve, reject) => {
+  //         let data = gm.MagickDescribeImage(this.wand);
+  //         resolve(data);
+  //     })
+  // }
 
-    // get_size() {
-    //     return new Promise((resolve, reject) => {
-    //         this.get_height().then((h) => {
-    //             this.get_width().then((w) => {
-    //                 resolve([h, w]);
-    //             })
-    //         })
-    //     })
-    // }
+  // get_size() {
+  //     return new Promise((resolve, reject) => {
+  //         this.get_height().then((h) => {
+  //             this.get_width().then((w) => {
+  //                 resolve([h, w]);
+  //             })
+  //         })
+  //     })
+  // }
 
-    read(buf) {
-        gm.MagickReadImageBlob(this.wand, buf, buf.length);
-        return this;
-    }
+  read(buf) {
+    gm.MagickReadImageBlob(this.wand, buf, buf.length);
+    return this;
+  }
 
-    resize(w, h) {
-        gm.MagickResizeImage(this.wand, w, h, FilterTypes.LanczosFilter);
-        return this;
-    }
+  readFile(file) {
+    gm.MagickReadImage(this.wand, file);
+    return this;
+  }
 
-    liquid_rescale(w, h, delta_x=1, rigidity=0) {
-        gm.MagickLiquidRescaleImage(this.wand, w, h, delta_x, rigidity);
-        return this;
-    }
+  resize(w, h, filter = consts.FilterTypes.LanczosFilter) {
+    gm.MagickResizeImage(this.wand, w, h, filter);
+    return this;
+  }
 
-    coalesce() {
-        gm.MagickCoalesceImages(this.wand);        
-        return this;
-    }
+  liquid_rescale(w, h, delta_x = 1, rigidity = 0) {
+    gm.MagickLiquidRescaleImage(this.wand, w, h, delta_x, rigidity);
+    return this;
+  }
 
-    write(file) {
-        gm.MagickWriteImages(this.wand, file, true);
-    }
+  coalesce() {
+    gm.MagickCoalesceImages(this.wand);
+    return this;
+  }
+
+  write(file) {
+    gm.MagickWriteImages(this.wand, file, true);
+    return this;
+  }
 }

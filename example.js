@@ -1,11 +1,11 @@
 #!/usr/bin/node
-const gm = require('./lib.js');
+const im = require('./lib.js');
 const fs = require('fs');
 
-gm.genesis();
+im.genesis();
 (async () => {
-    let file = fs.readFileSync(process.argv[2]);
-    let img = gm.load(file);
+    //let file = fs.readFileSync(process.argv[2]);
+    let img = im.load(process.argv[2]);
     let width = await img.get_width();
     let height = await img.get_height();
     console.log(`W: ${width} H: ${height}`);
@@ -15,9 +15,5 @@ gm.genesis();
         console.log(buf);
         fs.writeFileSync("out.jpg", buf);
     })
-    // gm.terminus();
+    im.terminus();
 })();
-// let img = gm.load(data).liquid_rescale(400, 400).liquid_rescale(800, 800).coalesce();
-// console.log(img);
-
-// gm.load(data).resize(100, 100).coalesce().write(process.argv[3]);
