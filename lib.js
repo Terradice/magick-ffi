@@ -32,6 +32,7 @@ const gm = ffi.Library("libMagickWand-7.Q16", {
     [wandPtr, "int", "int", "double", "double"],
   ],
   MagickCompositeLayers: ["bool", [wandPtr, wandPtr, "int", "int", "int"]],
+  MagickCompositeImageGravity: ["bool", [wandPtr, wandPtr, "int", "int"]],
   MagickCompositeImage: [
     "bool",
     [wandPtr, wandPtr, "int", "bool", "int", "int"],
