@@ -146,7 +146,7 @@ class Image {
   }
 
   layersComposite(wand, operator, x = 0, y = 0) {
-    gm.MagickCompositeLayers(this.wand, wand, consts.CompositeOperators[operator ? operator + "CompositeOp" : "OverCompositeOp"], x, y);
+    gm.MagickCompositeLayers(this.wand, wand.wand, consts.CompositeOperators[operator ? operator + "CompositeOp" : "OverCompositeOp"], x, y);
     return this;
   }
 
