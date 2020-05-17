@@ -2,7 +2,7 @@
   "name": "magick-ffi",
   "version": "1.0.0",
   "description": "ImageMagick FFI bindings",
-  "main": "index.js",
+  "main": "lib.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
