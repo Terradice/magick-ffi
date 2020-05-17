@@ -129,8 +129,8 @@ class Image {
     return this;
   }
 
-  resize(w, h, filter = consts.FilterTypes.LanczosFilter) {
-    gm.MagickResizeImage(this.wand, w, h, filter);
+  resize(w, h, filter) {
+    gm.MagickResizeImage(this.wand, w, h, consts.FilterTypes[filter ? filter : "LanczosFilter"]);
     return this;
   }
 
@@ -141,6 +141,16 @@ class Image {
 
   coalesce() {
     gm.MagickCoalesceImages(this.wand);
+    return this;
+  }
+
+  layersComposite(wand, operator, x, y) {
+    gm.MagickCompositeLayers(this.wand, wand, consts.CompositeOperators[operator ? operator + "CompositeOp" : "OverCompositeOp"], x ? x : 0, y ? y : 0);
+    return this;
+  }
+
+  setGravity(gravity) {
+    gm.MagickSetImageGravity(this.wand, consts.GravityTypes[gravity ? gravity : "NorthWestGravity"]);
     return this;
   }
 
