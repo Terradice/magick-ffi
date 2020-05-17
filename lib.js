@@ -39,6 +39,7 @@ const gm = ffi.Library("libMagickWand-7.Q16", {
   // Properties
   MagickSetOption: ["bool", [wandPtr, "string", "string"]],
   MagickSetFilename: ["bool", [wandPtr, "string"]],
+  MagickSetImageGravity: ["bool", [wandPtr, "int"]],
   MagickGetImageWidth: ["int", [wandPtr]],
   MagickGetImageHeight: ["int", [wandPtr]],
   MagickGetImagesBlob: ["uint8*", [wandPtr, ref.refType(ref.types.int)]],
@@ -144,8 +145,8 @@ class Image {
     return this;
   }
 
-  layersComposite(wand, operator, x, y) {
-    gm.MagickCompositeLayers(this.wand, wand, consts.CompositeOperators[operator ? operator + "CompositeOp" : "OverCompositeOp"], x ? x : 0, y ? y : 0);
+  layersComposite(wand, operator, x = 0, y = 0) {
+    gm.MagickCompositeLayers(this.wand, wand, consts.CompositeOperators[operator ? operator + "CompositeOp" : "OverCompositeOp"], x, y);
     return this;
   }
 
