@@ -39,7 +39,7 @@ var FilterTypes = Object.freeze({
     "SentinelFilter":       32
 })
 
-var gm = ffi.Library('libMagickWand-7.Q16HDRI', {
+var gm = ffi.Library('libMagickWand-7.Q16', {
     // Initialization and such
     'MagickWandGenesis':    [ 'void',   [ ] ],
     'MagickWandTerminus':   [ 'void',   [ ] ],
@@ -54,6 +54,7 @@ var gm = ffi.Library('libMagickWand-7.Q16HDRI', {
     // Iteration
     'MagickGetNumberImages':    [ 'int',    [ wandPtr ] ],
     'MagickSetIteratorIndex':   [ 'void',   [ wandPtr, 'int' ] ],
+    'MagickResetIterator':      [ 'void',   [ wandPtr ] ],
 
     // Image
     'MagickResizeImage':    [ 'bool',   [ wandPtr, "int", "int", "int" ] ],
@@ -65,9 +66,10 @@ var gm = ffi.Library('libMagickWand-7.Q16HDRI', {
     
     // Properties
     'MagickSetOption':      [ 'bool',   [ wandPtr, "string", "string" ] ],
+    'MagickSetFilename':    [ 'bool',   [ wandPtr, "string" ] ],
     'MagickGetImageWidth':  [ 'int',    [ wandPtr ] ],
     'MagickGetImageHeight': [ 'int',    [ wandPtr ] ],
-    'MagickGetImageBlob':   [ 'string', [ wandPtr, "int" ] ],
+    'MagickGetImagesBlob':  [ "uint8*", [ wandPtr, ref.refType(ref.types.int) ] ],
     'MagickSetImageFormat': [ 'bool',   [ wandPtr, 'string' ] ]
 
     //unsigned char *MagickGetImageBlob(MagickWand *wand,size_t *length)
@@ -117,12 +119,10 @@ class Image {
 
     get_blob() {
         return new Promise((resolve, reject) => {
-            let len = 0;
-            let buf = gm.MagickGetImageBlob(this.wand, len);  
-            console.log(len.deref());
-            console.log(buf.deref());
-            
-                                      
+            let len = ref.alloc("size_t", 0);
+            gm.MagickResetIterator(this.wand);
+            let out = gm.MagickGetImagesBlob(this.wand, len);
+            let buf = Buffer.alloc(len.deref(), ref.reinterpret(out, len.deref()));
             resolve(buf);
         })
     }

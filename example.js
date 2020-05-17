@@ -11,9 +11,9 @@ gm.genesis();
     console.log(`W: ${width} H: ${height}`);
 
     // img.liquid_rescale(width/1.2, height/1.2).liquid_rescale(width, height).coalesce().write(process.argv[3]);
-    img.resize(200, 200).coalesce().set_format("png");
-    img.get_blob().then((buf) => {
-        fs.writeFileSync("out.png", buf);
+    img.resize(200, 200).coalesce().set_format("jpg").get_blob().then((buf) => {
+        console.log(buf);
+        fs.writeFileSync("out.jpg", buf);
     })
     // gm.terminus();
 })();
