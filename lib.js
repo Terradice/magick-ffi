@@ -152,6 +152,12 @@ class Image {
     return this;
   }
 
+  compositeGravity(wand, operator, gravity) {
+    var result = gm.MagickCompositeImageGravity(this.wand, wand.wand, consts.CompositeOperators[operator ? operator + "CompositeOp" : "OverCompositeOp"], consts.GravityTypes[gravity ? gravity : "NorthWestGravity"]);
+    console.log(result);
+    return this;
+  }
+
   layersOptimize() {
     this.wand = gm.MagickOptimizeImageLayers(this.wand);
     return this;
